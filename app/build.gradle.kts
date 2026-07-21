@@ -2,7 +2,6 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization")
-    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
@@ -55,6 +54,13 @@ android {
 
     buildFeatures {
         compose = true
+    }
+
+    // The standalone org.jetbrains.kotlin.plugin.compose Gradle plugin only exists from
+    // Kotlin 2.0 onward; on 1.9.24 the Compose compiler is wired in this way instead.
+    // Version pinned per the Kotlin↔Compose-Compiler compatibility map for Kotlin 1.9.24.
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
 }
 
