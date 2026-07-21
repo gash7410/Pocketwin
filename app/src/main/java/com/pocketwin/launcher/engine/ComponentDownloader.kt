@@ -2,11 +2,14 @@ package com.pocketwin.launcher.engine
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.apache.commons.compress.archivers.ArchiveEntry
+import org.apache.commons.compress.archivers.ArchiveInputStream
 import org.apache.commons.compress.archivers.ArchiveStreamFactory
 import org.apache.commons.compress.compressors.CompressorStreamFactory
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
@@ -71,15 +74,17 @@ class ComponentDownloader {
      * Extracts a tar archive (optionally gzip/xz compressed) into [destDir]. Handles the
      * rootfs and Wine build formats these components are typically distributed as.
      */
-    suspend fun extract(archiveFile: File, destDir: File) = withContext(Dispatchers.IO) {
+    suspend fun extract(archiveFile: File, destDir: File): Unit = withContext(Dispatchers.IO) {
         destDir.mkdirs()
         BufferedInputStream(archiveFile.inputStream()).use { rawInput ->
-            val decompressed = runCatching {
+            val decompressed: InputStream = runCatching {
                 CompressorStreamFactory().createCompressorInputStream(rawInput)
             }.getOrElse { rawInput } // already an uncompressed tar
 
-            ArchiveStreamFactory().createArchiveInputStream(BufferedInputStream(decompressed)).use { archive ->
-                var entry = archive.nextEntry
+            val archiveStream: ArchiveInputStream<out ArchiveEntry> =
+                ArchiveStreamFactory().createArchiveInputStream(BufferedInputStream(decompressed))
+            archiveStream.use { archive ->
+                var entry: ArchiveEntry? = archive.nextEntry
                 while (entry != null) {
                     val outFile = File(destDir, entry.name).also { target ->
                         check(target.canonicalPath.startsWith(destDir.canonicalPath + File.separator)) {

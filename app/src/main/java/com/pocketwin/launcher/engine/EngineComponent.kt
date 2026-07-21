@@ -45,7 +45,7 @@ enum class ComponentKind {
  * Expected manifest JSON shape: a JSON array of [EngineComponent].
  */
 object ComponentCatalog {
-    const val manifestUrl: String? = null
+    val manifestUrl: String? = null
 
     val bundled: List<EngineComponent> = emptyList()
 }
