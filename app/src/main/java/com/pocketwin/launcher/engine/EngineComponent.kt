@@ -47,5 +47,29 @@ enum class ComponentKind {
 object ComponentCatalog {
     val manifestUrl: String? = null
 
-    val bundled: List<EngineComponent> = emptyList()
+    // Sourced from Box64Droid (https://github.com/Ilya114/Box64Droid), same
+    // proot+box64+wine stack this project targets. sha256 computed by downloading and
+    // hashing both assets directly from their GitHub Releases.
+    val bundled: List<EngineComponent> = listOf(
+        EngineComponent(
+            id = "box64droid-rootfs-chroot",
+            kind = ComponentKind.ROOTFS,
+            displayName = "Box64Droid rootfs (chroot)",
+            version = "stable",
+            targetAbi = "any",
+            downloadUrl = "https://github.com/Ilya114/Box64Droid/releases/download/stable/box64droid-rootfs-chroot.tar.xz",
+            sha256 = "2cdf894dfba422390ff5b8d84bcd5bc64331d2dd84f55660d2974999fc8177c5",
+            sizeBytes = 698274748,
+        ),
+        EngineComponent(
+            id = "wine-9.4-amd64-chroot",
+            kind = ComponentKind.WINE_BUILD,
+            displayName = "Wine 9.4 (amd64, chroot)",
+            version = "9.4",
+            targetAbi = "any",
+            downloadUrl = "https://github.com/Ilya114/Box64Droid/releases/download/alpha/wine-9.4-amd64-chroot.tar.xz",
+            sha256 = "59574c5a630d6e81cd9f7bd59c952974d9139bf166d79d63b0d63644ffb24880",
+            sizeBytes = 71106372,
+        ),
+    )
 }
