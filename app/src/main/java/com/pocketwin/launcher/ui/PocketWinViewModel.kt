@@ -10,6 +10,8 @@ import com.pocketwin.launcher.data.ContainerArchitecture
 import com.pocketwin.launcher.data.InstalledShortcut
 import com.pocketwin.launcher.engine.ContainerEngine
 import com.pocketwin.launcher.engine.EngineComponent
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -24,6 +26,10 @@ class PocketWinViewModel(application: Application) : AndroidViewModel(applicatio
     val componentStates = componentManager.states
 
     private var runningProcess: Process? = null
+
+    /** Set when [run] fails to even start the process chain (e.g. exec permission denied). */
+    private val _runError = MutableStateFlow<String?>(null)
+    val runError: StateFlow<String?> = _runError
 
     fun createContainer(name: String, architecture: ContainerArchitecture) {
         viewModelScope.launch {
@@ -60,9 +66,12 @@ class PocketWinViewModel(application: Application) : AndroidViewModel(applicatio
     /** Requires both a rootfs and a Wine build to already be installed via [installComponent]. */
     fun run(container: Container, rootfs: EngineComponent, wineBuild: EngineComponent, shortcut: InstalledShortcut) {
         viewModelScope.launch {
+            _runError.value = null
             runCatching {
                 runningProcess?.destroy()
                 runningProcess = containerEngine.launch(container, rootfs, wineBuild, shortcut.relativeExePath)
+            }.onFailure { e ->
+                _runError.value = "${e::class.simpleName}: ${e.message}"
             }
         }
     }

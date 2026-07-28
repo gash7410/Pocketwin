@@ -47,6 +47,7 @@ fun ContainerDetailScreen(
     val containers by viewModel.containers.collectAsState()
     val container = containers.find { it.id == containerId }
     val componentStates by viewModel.componentStates.collectAsState()
+    val runError by viewModel.runError.collectAsState()
     val context = LocalContext.current
 
     val rootfs = ComponentCatalog.bundled.find { it.kind == ComponentKind.ROOTFS }
@@ -97,6 +98,19 @@ fun ContainerDetailScreen(
                     Text("Add executable…")
                 }
                 Spacer(Modifier.height(8.dp))
+
+                if (runError != null) {
+                    Text(
+                        "Run failed: $runError",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        "Full output (if the process did start) is in this container's engine.log.",
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
 
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(container.shortcuts, key = { it.relativeExePath }) { shortcut ->
