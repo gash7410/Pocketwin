@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -48,6 +51,7 @@ fun ContainerDetailScreen(
     val container = containers.find { it.id == containerId }
     val componentStates by viewModel.componentStates.collectAsState()
     val runError by viewModel.runError.collectAsState()
+    val engineLog by viewModel.engineLog.collectAsState()
     val context = LocalContext.current
 
     val rootfs = ComponentCatalog.bundled.find { it.kind == ComponentKind.ROOTFS }
@@ -105,12 +109,21 @@ fun ContainerDetailScreen(
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodyMedium,
                     )
-                    Text(
-                        "Full output (if the process did start) is in this container's engine.log.",
-                        style = MaterialTheme.typography.bodySmall,
-                    )
                     Spacer(Modifier.height(8.dp))
                 }
+
+                Button(onClick = { viewModel.viewEngineLog(container) }) {
+                    Text("View log")
+                }
+                if (engineLog != null) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        engineLog!!,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp).verticalScroll(rememberScrollState()),
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
 
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(container.shortcuts, key = { it.relativeExePath }) { shortcut ->

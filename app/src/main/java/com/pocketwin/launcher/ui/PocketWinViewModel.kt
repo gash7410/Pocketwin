@@ -31,6 +31,17 @@ class PocketWinViewModel(application: Application) : AndroidViewModel(applicatio
     private val _runError = MutableStateFlow<String?>(null)
     val runError: StateFlow<String?> = _runError
 
+    /** Combined stdout/stderr of the proot/box/wine chain, loaded on demand via [viewEngineLog]. */
+    private val _engineLog = MutableStateFlow<String?>(null)
+    val engineLog: StateFlow<String?> = _engineLog
+
+    fun viewEngineLog(container: Container) {
+        viewModelScope.launch {
+            val logFile = File(containerRepository.containerStorageDir(container), "engine.log")
+            _engineLog.value = if (logFile.exists()) logFile.readText() else "(no engine.log yet -- the process never started)"
+        }
+    }
+
     fun createContainer(name: String, architecture: ContainerArchitecture) {
         viewModelScope.launch {
             containerRepository.create(Container(name = name, architecture = architecture))
