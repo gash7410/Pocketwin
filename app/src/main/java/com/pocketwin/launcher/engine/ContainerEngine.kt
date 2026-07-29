@@ -81,6 +81,10 @@ class ContainerEngine(
     }
 
     fun buildLaunchEnvironment(container: Container): Map<String, String> = buildMap {
+        // proot needs a real writable directory for its own bookkeeping (the "glue rootfs"
+        // it uses to intercept execve); plain "/tmp" doesn't exist as a real path on
+        // Android, so proot fails before it ever gets to box64/wine without this.
+        put("PROOT_TMP_DIR", context.cacheDir.absolutePath)
         put("WINEPREFIX", "/root/.wine")
         put("WINEARCH", if (container.architecture == ContainerArchitecture.WIN32) "win32" else "win64")
         put("WINEDEBUG", "-all")
