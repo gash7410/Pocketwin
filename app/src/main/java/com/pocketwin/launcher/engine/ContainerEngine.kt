@@ -74,7 +74,6 @@ class ContainerEngine(
             add("-b"); add("${wineDir.absolutePath}:$bindMountedWineDir")
             add("-b"); add("${prefixDir.absolutePath}:/root/.wine")
             add("-w"); add("/root")
-            add("--")
             add("$bindMountedNativeLibDir/$translator")
             add("$bindMountedWineDir/$wineBinary")
             add("C:\\${exeRelativePath.replace('/', '\\')}")
