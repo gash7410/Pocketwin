@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "PocketWin"
 include(":app")
+include(":voiceassistant")

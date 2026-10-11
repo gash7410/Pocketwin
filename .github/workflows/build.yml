@@ -24,3 +24,8 @@ jobs:
         with:
           name: pocketwin-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: voiceassistant-debug-apk
+          path: voiceassistant/build/outputs/apk/debug/voiceassistant-debug.apk
